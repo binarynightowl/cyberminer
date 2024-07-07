@@ -55,8 +55,11 @@ def buildWordCountDict(text):
                 
     return word_counts
 
+def buildDictFromURL(URL):
+    text = retrieveText(URL)
+    word_counts = buildWordCountDict(text)
+    return word_counts
+
 
 URL = "https://news.ycombinator.com/item?id=17787816"
-text = retrieveText(URL)
-word_counts = buildWordCountDict(text)
-print(word_counts)
+print(buildDictFromURL(URL))
