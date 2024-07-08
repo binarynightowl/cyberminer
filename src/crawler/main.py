@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import re
+import time
 import mysql.connector
 from mysql.connector import errorcode
 
@@ -92,6 +93,7 @@ def crawl(db_config, debug=False):
                         new_to_crawl.add((link, 1))  # New URLs to be crawled start at depth 1
 
                     crawled.add(url)
+                    time.sleep(0.04)
 
             to_crawl = new_to_crawl
 
