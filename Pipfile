@@ -4,6 +4,9 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+requests = "*"
+beautifulsoup4 = "*"
+mysql-connector-python = "*"
 
 [dev-packages]
 
