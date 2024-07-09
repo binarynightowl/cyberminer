@@ -74,37 +74,36 @@ def get_urls_to_scrape(cur, limit=1000):
     return cursor.fetchall()
 
 
-def insert_word_counts(con, cur, url_id, word_counts, debug=False):
+def insert_word_counts(con, cur, url_id, word_counts):
     for word, count in word_counts.items():
         if debug:
             print(f"{word}: {count}")
 
         # Use parameterized query to avoid SQL injection
-        cur.execute("SELECT count(*) as count FROM words WHERE word = ?", (word,))
+        cur.execute("SELECT count(*) as count FROM words WHERE word = %s", (word,))
         if cur.fetchone()['count'] == 0:
-            cur.execute("INSERT INTO words (word) VALUES (?)", (word,))
+            cur.execute("INSERT INTO words (word) VALUES (%s)", (word,))
             con.commit()
             word_id = cur.lastrowid
             if debug:
                 print(f"Word '{word}' not found, inserting a new record, ID: {word_id}")
         else:
-            cur.execute("SELECT id FROM words WHERE word = ?", (word,))
+            cur.execute("SELECT id FROM words WHERE word = %s", (word,))
             word_id = cur.fetchone()['id']
             if debug:
                 print(f"Word '{word}' found, ID: {word_id}")
 
-        cur.execute("SELECT count(*) as count FROM word_count WHERE word_id = ? AND url_id = ?", (word_id, url_id))
+        cur.execute("SELECT count(*) as count FROM word_count WHERE word_id = %s AND url_id = %s", (word_id, url_id))
         if cur.fetchone()['count'] == 0:
-            cur.execute("INSERT INTO word_count (word_id, url_id, count) VALUES (?, ?, ?)", (word_id, url_id, count))
+            cur.execute("INSERT INTO word_count (word_id, url_id, count) VALUES (%s, %s, %s)", (word_id, url_id, count))
             con.commit()
             if debug:
                 print(f"Relationship word_id: {word_id} url_id: {url_id} not found, inserting a new record")
         else:
-            cur.execute("UPDATE word_count SET count = ? WHERE word_id = ? AND url_id = ?", (count, word_id, url_id))
+            cur.execute("UPDATE word_count SET count = %s WHERE word_id = %s AND url_id = %s", (count, word_id, url_id))
             con.commit()
             if debug:
                 print(f"Relationship word_id: {word_id} url_id: {url_id} found, updating record")
-
 
 
 if __name__ == "__main__":
