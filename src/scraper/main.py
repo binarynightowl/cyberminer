@@ -119,6 +119,7 @@ if __name__ == "__main__":
     }
 
     conn = mysql.connector.connect(**db_config)
+
     try:
         cursor = conn.cursor(dictionary=True)
 
