@@ -1,6 +1,9 @@
 import requests
 from bs4 import BeautifulSoup
 from bs4.element import Comment
+import mysql.connector
+from mysql.connector import errorcode
+from os import getenv
 
 
 def retrieveText(URL):
@@ -60,5 +63,31 @@ def buildDictFromURL(URL):
     return word_counts
 
 
-URL = "https://news.ycombinator.com/item?id=17787816"
-print(buildDictFromURL(URL))
+def get_urls_to_scrape(cur, limit=1000):
+    query = \
+        f"""SELECT u.id, u.path
+           FROM urls u
+                    LEFT JOIN word_count wc ON u.id = wc.url_id
+           WHERE wc.id IS NULL ORDER BY id LIMIT {limit}"""
+
+    cur.execute(query)
+    return cursor.fetchall()
+
+
+if __name__ == "__main__":
+    debug = False  # Set this to True to enable debug output
+
+    db_config = {
+        'user': getenv("MARIADB_USERNAME"),
+        'password': getenv("MARIADB_PASSWORD"),
+        'host': getenv("MARIADB_HOST"),
+        'database': 'cyberminer',
+        'raise_on_warnings': True,
+    }
+
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor(dictionary=True)
+
+    urls = get_urls_to_scrape(cursor)
+    for url in urls:
+        print(buildDictFromURL(url['path']))
