@@ -83,22 +83,29 @@ def insert_word_counts(cur, url_id, word_counts):
         if cur.fetchone()['count'] == 0:
             cur.execute(f"INSERT INTO words (word) VALUE ('{word}')")
             word_id = cur.lastrowid
+            if debug:
+                print(f"Word '{word}' not found, inserting a new record, ID: {word_id}")
         else:
             cur.execute(f"select id from words where word = '{word}'")
             word_id = cur.fetchone()['id']
+            if debug:
+                print(f"Word '{word}' found, ID: {word_id}")
 
         cur.execute(f"select count(*) as count from word_count where word_id = {word_id} and url_id = {url_id}")
         if cur.fetchone()['count'] == 0:
             cur.execute(f"INSERT INTO word_count (word_id, url_id, count) VALUE ({word_id}, {url_id}, {count})")
+            if debug:
+                print(f"Relationship word_id: {word_id} url_id: {url_id} not found inserting a new record")
         else:
             cur.execute(
                 f"UPDATE word_count SET count = {count} WHERE word_id = {word_id} AND url_id = {url_id}"
             )
-        print()
+            if debug:
+                print(f"Relationship word_id: {word_id} url_id: {url_id} found")
 
 
 if __name__ == "__main__":
-    debug = True  # Set this to True to enable debug output
+    debug = False  # Set this to True to enable debug output
 
     db_config = {
         'user': getenv("MARIADB_USERNAME"),
