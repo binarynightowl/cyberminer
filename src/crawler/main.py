@@ -4,6 +4,7 @@ import re
 import time
 import mysql.connector
 from mysql.connector import errorcode
+from os import getenv
 
 
 def get_links(url):
@@ -27,12 +28,15 @@ def get_links(url):
 
 
 def insert_domain(cursor, domain):
-    cursor.execute("INSERT INTO domains (domain_name) VALUES (%s) ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id)", (domain,))
+    cursor.execute("INSERT INTO domains (domain_name) VALUES (%s) ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id)",
+                   (domain,))
     return cursor.lastrowid
 
 
 def insert_url(cursor, domain_id, path, depth):
-    cursor.execute("INSERT INTO urls (domain_id, path, depth) VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id)", (domain_id, path, depth))
+    cursor.execute(
+        "INSERT INTO urls (domain_id, path, depth) VALUES (%s, %s, %s) ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id)",
+        (domain_id, path, depth))
     return cursor.lastrowid
 
 
@@ -111,9 +115,9 @@ def crawl(db_config, debug=False):
 
 if __name__ == "__main__":
     db_config = {
-        'user': 'REDACTED',         # TODO: Get this from an environment variable
-        'password': 'REDACTED',     # TODO: Get this from an environment variable
-        'host': '172.20.20.1',
+        'user': getenv("MARIADB_USERNAME"),
+        'password': getenv("MARIADB_PASSWORD"),
+        'host': getenv("MARIADB_HOST"),
         'database': 'cyberminer',
         'raise_on_warnings': True,
     }

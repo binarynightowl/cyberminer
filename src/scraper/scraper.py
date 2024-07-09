@@ -82,7 +82,7 @@ def insert_word_counts(cur, url_id, word_counts):
 
 
 if __name__ == "__main__":
-    debug = False  # Set this to True to enable debug output
+    debug = True  # Set this to True to enable debug output
 
     db_config = {
         'user': getenv("MARIADB_USERNAME"),
