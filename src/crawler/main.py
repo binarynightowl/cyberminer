@@ -114,6 +114,8 @@ def crawl(db_config, debug=False):
 
 
 if __name__ == "__main__":
+    debug = False  # Set this to True to enable debug output
+
     db_config = {
         'user': getenv("MARIADB_USERNAME"),
         'password': getenv("MARIADB_PASSWORD"),
@@ -121,7 +123,5 @@ if __name__ == "__main__":
         'database': 'cyberminer',
         'raise_on_warnings': True,
     }
-
-    debug = False  # Set this to True to enable debug output
 
     crawl(db_config, debug)
