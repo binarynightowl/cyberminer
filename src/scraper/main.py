@@ -74,34 +74,37 @@ def get_urls_to_scrape(cur, limit=1000):
     return cursor.fetchall()
 
 
-def insert_word_counts(cur, url_id, word_counts):
+def insert_word_counts(con, cur, url_id, word_counts, debug=False):
     for word, count in word_counts.items():
         if debug:
             print(f"{word}: {count}")
 
-        cur.execute(f"select count(*) as count from words where word = '{word}'")
+        # Use parameterized query to avoid SQL injection
+        cur.execute("SELECT count(*) as count FROM words WHERE word = ?", (word,))
         if cur.fetchone()['count'] == 0:
-            cur.execute(f"INSERT INTO words (word) VALUE ('{word}')")
+            cur.execute("INSERT INTO words (word) VALUES (?)", (word,))
+            con.commit()
             word_id = cur.lastrowid
             if debug:
                 print(f"Word '{word}' not found, inserting a new record, ID: {word_id}")
         else:
-            cur.execute(f"select id from words where word = '{word}'")
+            cur.execute("SELECT id FROM words WHERE word = ?", (word,))
             word_id = cur.fetchone()['id']
             if debug:
                 print(f"Word '{word}' found, ID: {word_id}")
 
-        cur.execute(f"select count(*) as count from word_count where word_id = {word_id} and url_id = {url_id}")
+        cur.execute("SELECT count(*) as count FROM word_count WHERE word_id = ? AND url_id = ?", (word_id, url_id))
         if cur.fetchone()['count'] == 0:
-            cur.execute(f"INSERT INTO word_count (word_id, url_id, count) VALUE ({word_id}, {url_id}, {count})")
+            cur.execute("INSERT INTO word_count (word_id, url_id, count) VALUES (?, ?, ?)", (word_id, url_id, count))
+            con.commit()
             if debug:
-                print(f"Relationship word_id: {word_id} url_id: {url_id} not found inserting a new record")
+                print(f"Relationship word_id: {word_id} url_id: {url_id} not found, inserting a new record")
         else:
-            cur.execute(
-                f"UPDATE word_count SET count = {count} WHERE word_id = {word_id} AND url_id = {url_id}"
-            )
+            cur.execute("UPDATE word_count SET count = ? WHERE word_id = ? AND url_id = ?", (count, word_id, url_id))
+            con.commit()
             if debug:
-                print(f"Relationship word_id: {word_id} url_id: {url_id} found")
+                print(f"Relationship word_id: {word_id} url_id: {url_id} found, updating record")
+
 
 
 if __name__ == "__main__":
@@ -126,7 +129,7 @@ if __name__ == "__main__":
                 word_count = buildDictFromURL(url['path'])
                 if debug:
                     print(f"{word_count}\n")
-                insert_word_counts(cursor, url['id'], word_count)
+                insert_word_counts(conn, cursor, url['id'], word_count)
             urls = get_urls_to_scrape(cursor, limit=100)
     except mysql.connector.Error as err:
         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
