@@ -7,6 +7,9 @@ name = "pypi"
 requests = "*"
 beautifulsoup4 = "*"
 mysql-connector-python = "*"
+flask = "*"
+flask-sqlalchemy = "*"
+pymysql = "*"
 
 [dev-packages]
 
