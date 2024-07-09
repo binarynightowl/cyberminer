@@ -75,7 +75,6 @@ def get_urls_to_scrape(cur, limit=1000):
 
 
 def insert_word_counts(cur, url_id, word_counts):
-    # TODO: Actually implement the inserts here
     for word, count in word_counts.items():
         if debug:
             print(f"{word}: {count}")
@@ -92,8 +91,9 @@ def insert_word_counts(cur, url_id, word_counts):
         if cur.fetchone()['count'] == 0:
             cur.execute(f"INSERT INTO word_count (word_id, url_id, count) VALUE ({word_id}, {url_id}, {count})")
         else:
-            # TODO: Update existing record here if it exists already
-            pass
+            cur.execute(
+                f"UPDATE word_count SET count = {count} WHERE word_id = {word_id} AND url_id = {url_id}"
+            )
         print()
 
 
