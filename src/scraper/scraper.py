@@ -74,6 +74,13 @@ def get_urls_to_scrape(cur, limit=1000):
     return cursor.fetchall()
 
 
+def insert_word_counts(cur, url_id, word_counts):
+    # TODO: Actually implement the inserts here
+    for word, count in word_counts.items():
+        if debug:
+            print(f"{word}: {count}")
+
+
 if __name__ == "__main__":
     debug = False  # Set this to True to enable debug output
 
@@ -90,4 +97,7 @@ if __name__ == "__main__":
 
     urls = get_urls_to_scrape(cursor)
     for url in urls:
-        print(buildDictFromURL(url['path']))
+        word_count = buildDictFromURL(url['path'])
+        if debug:
+            print(f"{word_count}\n")
+        insert_word_counts(cursor, url['id'], word_count)
