@@ -120,12 +120,14 @@ if __name__ == "__main__":
     try:
         cursor = conn.cursor(dictionary=True)
 
-        urls = get_urls_to_scrape(cursor)
-        for url in urls:
-            word_count = buildDictFromURL(url['path'])
-            if debug:
-                print(f"{word_count}\n")
-            insert_word_counts(cursor, url['id'], word_count)
+        urls = get_urls_to_scrape(cursor, limit=100)
+        while len(urls) > 0:
+            for url in urls:
+                word_count = buildDictFromURL(url['path'])
+                if debug:
+                    print(f"{word_count}\n")
+                insert_word_counts(cursor, url['id'], word_count)
+            urls = get_urls_to_scrape(cursor, limit=100)
     except mysql.connector.Error as err:
         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
             print("Something is wrong with your user name or password")
