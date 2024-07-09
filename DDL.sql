@@ -33,6 +33,8 @@ CREATE TABLE word_count
     FOREIGN KEY (url_id) REFERENCES urls (id)
 );
 
-ALTER TABLE words CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE words
+    CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
-ALTER TABLE word_count CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+ALTER TABLE word_count
+    CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;

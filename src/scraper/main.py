@@ -68,7 +68,7 @@ def get_urls_to_scrape(cur, limit=1000):
         f"""SELECT u.id, u.path
            FROM urls u
                     LEFT JOIN word_count wc ON u.id = wc.url_id
-           WHERE wc.id IS NULL ORDER BY id LIMIT {limit}"""
+           WHERE wc.id IS NULL ORDER BY RAND() LIMIT {limit}"""
 
     cur.execute(query)
     return cursor.fetchall()
