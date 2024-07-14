@@ -38,3 +38,10 @@ ALTER TABLE words
 
 ALTER TABLE word_count
     CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+
+CREATE TABLE ignored_domains
+(
+    id     INT AUTO_INCREMENT PRIMARY KEY,
+    domain INT NOT NULL,
+    FOREIGN KEY (domain) REFERENCES domains (id)
+)
