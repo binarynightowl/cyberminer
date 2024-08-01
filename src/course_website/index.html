@@ -48,6 +48,26 @@
         a:hover {
             text-decoration: underline;
         }
+
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 4px solid #3498db;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+            display: none;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
 <body>
@@ -80,6 +100,7 @@
         <input type="text" id="searchTerm" placeholder="Enter search term">
         <button type="submit">Search</button>
     </form>
+    <div class="loader" id="loader"></div>
 </section>
 
 <section>
@@ -94,6 +115,8 @@
     });
 
     function search(term) {
+        const loader = document.getElementById('loader');
+        loader.style.display = 'block'; // Show the loader
         fetch('https://ec2.cyberminer.org/search', {
             method: 'POST',
             headers: {
@@ -102,8 +125,14 @@
             body: JSON.stringify({search_term: term})
         })
             .then(response => response.json())
-            .then(data => displayResults(data))
-            .catch(error => console.error('Error:', error));
+            .then(data => {
+                loader.style.display = 'none'; // Hide the loader
+                displayResults(data);
+            })
+            .catch(error => {
+                loader.style.display = 'none'; // Hide the loader
+                console.error('Error:', error);
+            });
     }
 
     function displayResults(results) {
@@ -123,4 +152,3 @@
 </script>
 </body>
 </html>
-
