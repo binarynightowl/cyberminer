@@ -2,6 +2,8 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from os import getenv
 
+from sqlalchemy import and_, or_, not_
+
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = getenv("SQLALCHEMY_DATABASE_URI")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -51,11 +53,11 @@ def search():
     search_terms = search_term.split()
 
     if search_type == 'AND':
-        pass
+        filter_condition = and_(*[Word.word.like(f'%{term}%') for term in search_terms])
     elif search_type == 'OR':
-        pass
+        filter_condition = or_(*[Word.word.like(f'%{term}%') for term in search_terms])
     elif search_type == 'NOT':
-        pass
+        filter_condition = not_(or_(*[Word.word.like(f'%{term}%') for term in search_terms]))
     else:
         return jsonify({'error': 'Invalid search type provided'}), 400
 
@@ -64,7 +66,7 @@ def search():
         URL.path
     ).join(Word, WordCount.word_id == Word.id
            ).join(URL, WordCount.url_id == URL.id
-                  ).filter(Word.word.like(f'%{search_term}%')
+                  ).filter(filter_condition
                            ).group_by(URL.path
                                       ).order_by(db.desc('count')
                                                  ).all()
