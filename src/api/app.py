@@ -51,11 +51,11 @@ def search():
     search_terms = search_term.split()
 
     if search_type == 'AND':
-        search_query = ' '.join(search_terms)
+        pass
     elif search_type == 'OR':
-        search_query = ' | '.join(search_terms)
+        pass
     elif search_type == 'NOT':
-        search_query = ' '.join([f'-{term}' for term in search_terms])
+        pass
     else:
         return jsonify({'error': 'Invalid search type provided'}), 400
 
@@ -64,11 +64,10 @@ def search():
         URL.path
     ).join(Word, WordCount.word_id == Word.id
            ).join(URL, WordCount.url_id == URL.id
-                  ).filter(db.text(f"MATCH(words.word) AGAINST(:search_query IN BOOLEAN MODE)")
-                           ).params(search_query=search_query
-                                    ).group_by(URL.path
-                                               ).order_by(db.desc('count')
-                                                          ).all()
+                  ).filter(Word.word.like(f'%{search_term}%')
+                           ).group_by(URL.path
+                                      ).order_by(db.desc('count')
+                                                 ).all()
 
     return jsonify([{'count': result.count, 'path': result.path} for result in results])
 
