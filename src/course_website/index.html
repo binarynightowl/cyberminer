@@ -11,12 +11,14 @@
             padding: 0;
             background-color: #f4f4f4;
         }
+
         header {
             background-color: #333;
             color: #fff;
             padding: 1rem;
             text-align: center;
         }
+
         section {
             margin: 2rem;
             padding: 1rem;
@@ -24,20 +26,25 @@
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
+
         h2 {
             color: #333;
         }
+
         ul {
             list-style-type: none;
             padding: 0;
         }
+
         li {
             margin: 0.5rem 0;
         }
+
         a {
             color: #0066cc;
             text-decoration: none;
         }
+
         a:hover {
             text-decoration: underline;
         }
@@ -68,6 +75,52 @@
     </ul>
 </section>
 
+<section>
+    <form id="searchForm">
+        <input type="text" id="searchTerm" placeholder="Enter search term">
+        <button type="submit">Search</button>
+    </form>
+</section>
+
+<section>
+    <ul id="results"></ul>
+</section>
+
+<script>
+    document.getElementById('searchForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+        const searchTerm = document.getElementById('searchTerm').value;
+        search(searchTerm);
+    });
+
+    function search(term) {
+        fetch('https://ec2.cyberminer.org/search', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({search_term: term})
+        })
+            .then(response => response.json())
+            .then(data => displayResults(data))
+            .catch(error => console.error('Error:', error));
+    }
+
+    function displayResults(results) {
+        const resultsList = document.getElementById('results');
+        resultsList.innerHTML = ''; // Clear any previous results
+        results.forEach(result => {
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = result.path;
+            a.textContent = result.path;
+            a.target = '_blank';
+            li.textContent = `Count: ${result.count} - `;
+            li.appendChild(a);
+            resultsList.appendChild(li);
+        });
+    }
+</script>
 </body>
 </html>
 
