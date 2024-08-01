@@ -52,10 +52,11 @@ def search():
         URL.path
     ).join(Word, WordCount.word_id == Word.id
            ).join(URL, WordCount.url_id == URL.id
-                  ).filter(db.func.match(Word.word, search_term)
-                           ).group_by(URL.path
-                                      ).order_by(db.desc('count')
-                                                 ).all()
+                  ).filter(db.text(f"MATCH(words.word) AGAINST(:search_term IN BOOLEAN MODE)")
+                           ).params(search_term=search_term
+                                    ).group_by(URL.path
+                                               ).order_by(db.desc('count')
+                                                          ).all()
 
     return jsonify([{'count': result.count, 'path': result.path} for result in results])
 
