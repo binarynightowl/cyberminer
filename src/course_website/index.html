@@ -92,9 +92,9 @@
     <h2>Deliverables</h2>
     <ul>
         <li><a href="/deliverables/Preliminary_Project_Plan.pdf" target="_blank">Preliminary Project 1 Plan</a></li>
-        <li><a href="/deliverables/Preliminary_Project_Plan.pdf" target="_blank">Final Project 1 Plan</a></li>
-        <li><a href="/deliverables/Preliminary_Project_Plan.pdf" target="_blank">Preliminary Project 2 Plan</a></li>
-        <li><a href="/deliverables/Preliminary_Project_Plan.pdf" target="_blank">Final Project 2 Plan</a></li>
+        <li><a href="/deliverables/Interim 1 doc.pdf" target="_blank">Final Project 1 Plan</a></li>
+        <li><a href="/deliverables/Interim II.pdf" target="_blank">Preliminary Project 2 Plan</a></li>
+        <li><a href="/deliverables/Final.pdf" target="_blank">Final Project 2 Plan</a></li>
     </ul>
 </section>
 
@@ -106,13 +106,13 @@
             <option value="OR">OR</option>
             <option value="NOT">NOT</option>
         </select>
-        <button type="submit">Search</button>
+        <button type="submit" id="searchButton">Search</button>
     </form>
 </section>
 
 <section>
-    <ul id="results"></ul>
     <div class="loader" id="loader"></div>
+    <ul id="results"></ul>
 </section>
 
 <script>
@@ -125,7 +125,9 @@
 
     function search(term, type) {
         const loader = document.getElementById('loader');
+        const searchButton = document.getElementById('searchButton');
         loader.style.display = 'block'; // Show the loader
+        searchButton.disabled = true; // Disable the search button
         fetch('https://ec2.cyberminer.org/search', {
             method: 'POST',
             headers: {
@@ -136,10 +138,12 @@
             .then(response => response.json())
             .then(data => {
                 loader.style.display = 'none'; // Hide the loader
+                searchButton.disabled = false; // Enable the search button
                 displayResults(data);
             })
             .catch(error => {
                 loader.style.display = 'none'; // Hide the loader
+                searchButton.disabled = false; // Enable the search button
                 console.error('Error:', error);
             });
     }
