@@ -44,4 +44,21 @@ CREATE TABLE ignored_domains
     id     INT AUTO_INCREMENT PRIMARY KEY,
     domain INT NOT NULL,
     FOREIGN KEY (domain) REFERENCES domains (id)
-)
+);
+
+CREATE INDEX idx_urls_domain_id ON urls (domain_id);
+
+CREATE INDEX idx_words_word ON words (word(255));
+
+CREATE INDEX idx_word_count_word_id_url_id ON word_count (word_id, url_id);
+
+CREATE UNIQUE INDEX idx_domains_domain_name ON domains (domain_name(255));
+
+CREATE INDEX idx_urls_path ON urls (path(255));
+
+CREATE INDEX idx_word_count_count ON word_count (count);
+
+CREATE INDEX idx_word_count_composite ON word_count (word_id, url_id, count);
+
+ALTER TABLE words
+    ADD FULLTEXT INDEX ft_words_word (word);

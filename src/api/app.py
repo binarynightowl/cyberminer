@@ -52,7 +52,7 @@ def search():
         URL.path
     ).join(Word, WordCount.word_id == Word.id
            ).join(URL, WordCount.url_id == URL.id
-                  ).filter(Word.word.like(f'%{search_term}%')
+                  ).filter(db.func.match(Word.word, search_term)
                            ).group_by(URL.path
                                       ).order_by(db.desc('count')
                                                  ).all()
