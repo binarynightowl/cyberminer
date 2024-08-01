@@ -43,17 +43,29 @@ class WordCount(db.Model):
 @app.route('/search', methods=['POST'])
 def search():
     search_term = request.json.get('search_term', '')
+    search_type = request.json.get('search_type', 'OR')
 
     if not search_term:
         return jsonify({'error': 'No search term provided'}), 400
+
+    search_terms = search_term.split()
+
+    if search_type == 'AND':
+        search_query = ' '.join(search_terms)
+    elif search_type == 'OR':
+        search_query = ' | '.join(search_terms)
+    elif search_type == 'NOT':
+        search_query = ' '.join([f'-{term}' for term in search_terms])
+    else:
+        return jsonify({'error': 'Invalid search type provided'}), 400
 
     results = db.session.query(
         db.func.sum(WordCount.count).label('count'),
         URL.path
     ).join(Word, WordCount.word_id == Word.id
            ).join(URL, WordCount.url_id == URL.id
-                  ).filter(db.text(f"MATCH(words.word) AGAINST(:search_term IN BOOLEAN MODE)")
-                           ).params(search_term=search_term
+                  ).filter(db.text(f"MATCH(words.word) AGAINST(:search_query IN BOOLEAN MODE)")
+                           ).params(search_query=search_query
                                     ).group_by(URL.path
                                                ).order_by(db.desc('count')
                                                           ).all()

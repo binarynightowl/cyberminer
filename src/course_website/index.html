@@ -98,6 +98,11 @@
 <section>
     <form id="searchForm">
         <input type="text" id="searchTerm" placeholder="Enter search term">
+        <select id="searchType">
+            <option value="AND">AND</option>
+            <option value="OR">OR</option>
+            <option value="NOT">NOT</option>
+        </select>
         <button type="submit">Search</button>
     </form>
 </section>
@@ -111,10 +116,11 @@
     document.getElementById('searchForm').addEventListener('submit', function (event) {
         event.preventDefault();
         const searchTerm = document.getElementById('searchTerm').value;
-        search(searchTerm);
+        const searchType = document.getElementById('searchType').value;
+        search(searchTerm, searchType);
     });
 
-    function search(term) {
+    function search(term, type) {
         const loader = document.getElementById('loader');
         loader.style.display = 'block'; // Show the loader
         fetch('https://ec2.cyberminer.org/search', {
@@ -122,7 +128,7 @@
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({search_term: term})
+            body: JSON.stringify({search_term: term, search_type: type})
         })
             .then(response => response.json())
             .then(data => {
@@ -149,6 +155,7 @@
             resultsList.appendChild(li);
         });
     }
+
 </script>
 </body>
 </html>
